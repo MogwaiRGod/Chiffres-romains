@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Convertisseur de nombres en chiffres romains</title>        
+    </head>
+</html>
+
+<body style="background: rgb(25, 24, 24)">
+    <style>
+        * {
+            color:rgb(244, 239, 240);
+        }
+        #container {
+            
+        }
+        h1 {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            position: relative;
+            margin-top: 10%;
+            font-size: 3em;
+            text-align: center;
+        }
+        input, button {
+            background: rgb(13, 9, 8);
+            border-color: rgb(120, 87, 76);
+            color:rgb(158, 137, 123);
+        }
+        section {
+            width: 50%;
+            font-family: Helvetica, Arial, sans-serif ;
+            position: relative;
+            left: 40%;
+        }
+        #output {
+            position: relative;
+            margin: 0;
+            font-size: 7em;
+            text-align: center;
+            font-family: 'Rockwell', serif;
+        }
+        #non {
+            color:rgb(210, 86, 55);
+            text-align: center;
+            font-family: Helvetica, sans-serif;
+            text-transform:uppercase;
+            visibility: hidden;
+        }
+    </style>
+    <div id="container">
+        <header>
+            <h1>Convertisseur de nombres arabes<br> en chiffres romains</h1>
+        </header>
+        <main>
+            <section>
+                <label>Entrer un nombre</label>
+                <input id="input_nb" type="number" placeholder="Votre nombre">
+                <button id="btn">Valider</button>
+            </section>
+            <p id="non">Entrée incorrecte</p>
+            <p id="output"></p>
+        </main>
+    </div>
+
+    <script>
+
+        ///////////////////     FONCTION PRINCIPALE
+        // fonctionne pour un nombre entier de 1 à 3999
+        function nombreRomain (nb_arabe){
+            function checkNb (nb) { //  vérification de l'entrée
+                return nb > 0 && nb < 4000 && nb===parseInt(nb);
+            }
+
+            if (checkNb(nb_arabe)){ // si elle est correcte, on lance la fonction (sinon, on retourne une erreur)
+
+                let tmp_nb=nb_arabe;
+                let nb_romain ="";
+                let compteur=0; //  pour savoir où en est dans les unités, dizaines etc. 
+                                // afin de choisir les bons symboles dans le tableau ci-dessous
+                let symboles_romains = [
+                    "I", "V", "X", "L", "C", "D", "M",
+                ];
+
+
+                // fonction principale : va convertir un nombre en nombre romain
+                function calculRomain (nb, car_standard, car_intermediaire, car_suivant) {    // e.g pour les unités : car_standard = I
+                                                                                                // car_intermediaire = V
+                                                                                                // car_suivant = X
+                    let romain ="";
+
+                    if (nb >0 && nb <10) {  // les équivalents de 0 n'ont pas de caractère en chiffre romain
+                        if (nb === 4) { // 4, 40 etc... ont une combinaison de symbole particulière (IV, XL...)
+                            romain = car_standard + car_intermediaire;
+                        } else if (nb === 9) { // 9, 90, 900... ont, de même, une combinaison particulière de symobole (IX, XC, CM...)
+                            romain = car_standard + car_suivant;
+                        } else {
+                            if (nb >= 5) {
+                                romain += car_intermediaire;    // 5, 50, 500... ont un symbole particulier, mais les autres unités s'ajoutent normalement
+                                nb -= 5;                        // par la suite. Donc, une fois qu'on a mis la valeur de 5x dans le nombre romain, on soustrait 5 du nombre
+                            }                                   // initial et on ajoute les autres unités dans la boucle suivante
+                            for (let i=1; i<= nb; i++){ // 1, 2, 3, 6, 7, 8x ... ont une combinaison normale de symbole
+                                romain += car_standard;
+                            } //  FIN POUR
+                        }   //  FIN SI
+                    } //  FIN SI
+
+                    return romain;
+                }   // FIN FONCTION CALCUL ROMAIN
+
+
+                // CORPS DE LA FONCTION PRINCIPALE
+                while(tmp_nb >=1) {
+                    if (tmp_nb.toString().length >1 ){
+                        tmp_nb%=10;
+                    }
+                    nb_romain = calculRomain (tmp_nb, symboles_romains[compteur], symboles_romains[compteur+1], symboles_romains[compteur+2]) + nb_romain;
+                    nb_arabe= (nb_arabe - tmp_nb)/10;
+                    tmp_nb=nb_arabe;
+                    
+                    compteur+=2;
+                }
+
+                document.getElementById("output").style.visibility = 'visible';
+                document.getElementById("non").style.visibility = 'hidden'; // au cas où on aurait eu un avertissement avant
+                return nb_romain;
+
+            } else {
+                document.getElementById("non").style.visibility = 'visible';
+                document.getElementById("output").style.visibility = 'hidden';
+                return;
+            }  // FIN SI INITIAL
+        }   // FIN FONCTION NOMBRE ROMAIN
+
+
+        ///////////////////////////////////////////////////     SCRIPT
+
+        // récupération des entrées utilisateur
+        btn.addEventListener('click', () => {
+            let nb_input = parseInt(document.getElementById("input_nb").value);
+            
+            // transformation du nombre utilisateur pour l'output
+            let output = nombreRomain(nb_input);
+
+            // affichage de l'output sur la page
+            document.getElementById("output").innerText = output;
+        });
+        
+    </script>
+</body>
